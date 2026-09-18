@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/mandel_core",
+    "crates/haavk_desktop",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["HAAVK Group"]
+description = "HAAVK OS - 曼德尔全域算力系统（Mandel Core + HAAVK Desktop）"
+license = "MIT"
+
+[profile.release]
+opt-level = 2
+lto = true

@@ -1,0 +1,72 @@
+# ============================================================
+# HAAVK OS · Mandel Core 曼德尔核心 主配置
+# 标语：天空哈夫克，新世界就在你耳边
+# 版本：Stage 1 (MVP-1)
+# ============================================================
+
+[core]
+# 核心版本号
+version = "0.1.0-mvp"
+# 节点唯一ID（首次启动自动生成，可手动修改）
+node_id = "HAAVK-NODE-00001"
+# 日志等级: trace / debug / info / warn / error
+log_level = "info"
+# 是否开启核心守护服务
+daemon = true
+# 最大允许同时运行的 .hvk 应用数量
+max_app_count = 64
+
+[hardware]
+# 是否读取宿主 DMI/SMBIOS 硬件信息（用于"关于全域算力节点"面板）
+read_dmi = true
+# DMI 读取超时（毫秒）
+dmi_timeout = 1000
+# 曼德尔核心及 HAAVK 应用总内存上限（对应 16GB 虚拟机，单位 MB）
+memory_limit_mb = 16384
+# 虚拟存储总配额（对应 100GB 虚拟机，单位 MB）
+storage_quota_mb = 102400
+
+[relink_bus]
+# Relink 同频 IPC 总线（Stage 1 为骨架）
+enable = true
+# 局域网节点自动发现
+node_discovery = true
+# 节点发现 UDP 端口
+discovery_port = 42069
+# 跨设备公网中继（Stage 4 启用）
+relay_server_enable = false
+# 单节点最大并发连接
+max_connections = 32
+
+[vfs]
+# 曼德尔虚拟文件系统
+enable = true
+# 根挂载前缀
+root_prefix = "haavk://"
+# 自动映射宿主目录到 HAAVK 全域节点
+auto_mount_host = true
+# 隔离模式：true=独立 .mandel 镜像；false=透传宿主文件（Stage 1 用 false）
+isolate_mode = false
+# 虚拟磁盘镜像路径（isolate_mode=true 时生效，Stage 4 启用）
+image_path = "./haavk_storage.mandel"
+
+[window_manager]
+enable = true
+max_windows = 48
+alt_tab_switch = true
+animations = true
+# 渲染后端：auto / vulkan / dx12 / opengl
+render_backend = "auto"
+
+[security]
+# .hvk 应用默认权限策略
+default_permission = "restricted"
+allow_file_access = true
+allow_network_access = true
+allow_input_hook = false
+
+[network]
+# HAAVK 内部网络代理开关（仅代理，不替代宿主内核 TCP/IP）
+proxy_network = true
+# 允许 HAAVK 应用访问外网
+internet_access = true

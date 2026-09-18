@@ -1,0 +1,17 @@
+[package]
+name = "mandel_core"
+version.workspace = true
+edition.workspace = true
+description = "HAAVK Mandel Core 曼德尔核心（用户态微内核）"
+
+[[bin]]
+name = "mandel-core"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+log = "0.4"
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4"

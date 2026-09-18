@@ -1,0 +1,27 @@
+[package]
+name = "haavk_desktop"
+version.workspace = true
+edition.workspace = true
+description = "HAAVK Desktop 哈夫克桌面环境（Windows交互逻辑 + HAAVK赛博视觉）"
+build = "build.rs"
+
+[[bin]]
+name = "haavk"
+path = "src/main.rs"
+
+[dependencies]
+winit = "0.30"
+wgpu = "24"
+pollster = "0.3"
+bytemuck = { version = "1", features = ["derive"] }
+image = "0.25"
+env_logger = "0.11"
+log = "0.4"
+chrono = "0.4"
+egui = "0.31"
+egui-wgpu = "0.31"
+egui-winit = "0.31"
+mandel_core = { path = "../mandel_core" }
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
