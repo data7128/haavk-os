@@ -303,7 +303,9 @@ pub fn settings_ui(ui: &mut egui::Ui, core: &MandelCore) {
                 kv(ui, "内存", &format!("{} MB（上限 {} MB）", core.hardware.memory_mb, core.config.hardware.memory_limit_mb));
                 kv(ui, "存储配额", &format!("{} MB", core.config.hardware.storage_quota_mb));
                 kv(ui, "网卡", &core.hardware.network);
-                kv(ui, "Relink 总线", if core.relink.enabled { "同频在线" } else { "未启用" });
+                kv(ui, "本机 IP", &core.hardware.local_ip);
+                kv(ui, "Relink 总线", if core.relink.enabled { "同频在线 (UDP 42069)" } else { "未启用" });
+                kv(ui, "在线节点", &format!("{} 个", core.relink.peer_count()));
             });
         ui.separator();
 
@@ -472,6 +474,8 @@ fn run_shell_cmd(core: &MandelCore, state: &mut TerminalState, cmd: &str) {
             out("  nodes         列出 Relink 同频节点");
             out("  apps          列出已安装 .hvk 应用");
             out("  disk          显示 .mandel 虚拟磁盘用量");
+            out("  ping <主机>   测试网络连通性");
+            out("  curl <URL>    获取网页内容（前 500 字节）");
             out("  clear         清空终端");
         }
         "pwd" => out(&state.cwd),
@@ -520,6 +524,44 @@ fn run_shell_cmd(core: &MandelCore, state: &mut TerminalState, cmd: &str) {
             }
         }
         "clear" => state.output.clear(),
+        "ping" => {
+            let host = parts.next().unwrap_or("8.8.8.8");
+            out(&format!("ping {host} ..."));
+            let t0 = std::time::Instant::now();
+            match std::net::TcpStream::connect_timeout(
+                &format!("{host}:80").parse().unwrap(),
+                std::time::Duration::from_secs(3),
+            ) {
+                Ok(_) => out(&format!("  连接成功，耗时 {} ms", t0.elapsed().as_millis())),
+                Err(e) => out(&format!("  连接失败: {e}")),
+            }
+        }
+        "curl" => {
+            let url = parts.next().unwrap_or("https://example.com");
+            out(&format!("curl {url} ..."));
+            // 简单 HTTP GET（仅支持 http/https 前缀提取 host）
+            let addr = url.trim_start_matches("https://").trim_start_matches("http://");
+            let addr = addr.split('/').next().unwrap_or(addr);
+            match std::net::TcpStream::connect_timeout(
+                &format!("{addr}:80").parse().unwrap(),
+                std::time::Duration::from_secs(5),
+            ) {
+                Ok(mut stream) => {
+                    use std::io::Write;
+                    let _ = write!(stream, "GET / HTTP/1.0\r\nHost: {addr}\r\n\r\n");
+                    use std::io::Read;
+                    let mut buf = [0u8; 500];
+                    if let Ok(n) = stream.read(&mut buf) {
+                        let text = String::from_utf8_lossy(&buf[..n]);
+                        out(&format!("  收到 {} 字节：", n));
+                        for line in text.lines().take(8) {
+                            out(&format!("    {line}"));
+                        }
+                    }
+                }
+                Err(e) => out(&format!("  curl 失败: {e}")),
+            }
+        }
         other => out(&format!("mandel: 未找到命令：{other}（输入 help 查看）")),
     }
 }

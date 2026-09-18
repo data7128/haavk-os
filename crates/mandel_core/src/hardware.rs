@@ -20,6 +20,7 @@ pub struct HardwareInfo {
     pub cpu: String,
     pub memory_mb: u64,
     pub network: String,
+    pub local_ip: String,
 }
 
 impl HardwareInfo {
@@ -33,6 +34,7 @@ impl HardwareInfo {
             cpu: "Mandel CPU (未知)".into(),
             memory_mb: 0,
             network: "e1000 (未知)".into(),
+            local_ip: "0.0.0.0".into(),
         }
     }
 
@@ -106,6 +108,7 @@ fn collect_impl() -> HardwareInfo {
         cpu,
         memory_mb,
         network,
+        local_ip: local_ip(),
     }
 }
 
@@ -151,6 +154,7 @@ fn collect_impl() -> HardwareInfo {
         cpu: nonempty(&cpu, "Mandel CPU"),
         memory_mb,
         network,
+        local_ip: local_ip(),
     }
 }
 
@@ -161,6 +165,18 @@ fn collect_impl() -> HardwareInfo {
 
 fn nonempty(v: &str, fallback: &str) -> String {
     if v.trim().is_empty() { fallback.to_string() } else { v.to_string() }
+}
+
+/// 获取本机出口 IP（UDP connect 到 8.8.8.8，不实际发包）
+fn local_ip() -> String {
+    use std::net::UdpSocket;
+    match UdpSocket::bind("0.0.0.0:0") {
+        Ok(sock) => match sock.connect("8.8.8.8:80") {
+            Ok(_) => sock.local_addr().map(|a| a.ip().to_string()).unwrap_or_else(|_| "0.0.0.0".into()),
+            Err(_) => "0.0.0.0".into(),
+        },
+        Err(_) => "0.0.0.0".into(),
+    }
 }
 
 #[cfg(test)]

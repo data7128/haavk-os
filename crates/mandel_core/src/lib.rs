@@ -71,7 +71,7 @@ impl MandelCore {
         } else {
             HardwareInfo::unknown()
         };
-        info!("硬件：{} / CPU {} / RAM {} MB", hardware.product_name, hardware.cpu, hardware.memory_mb);
+        info!("硬件：{} / CPU {} / RAM {} MB / IP {}", hardware.product_name, hardware.cpu, hardware.memory_mb, hardware.local_ip);
 
         // Relink 总线（真实 UDP 42069 节点发现）
         let mut relink = RelinkBus::new(&config);
@@ -128,6 +128,7 @@ impl MandelCore {
              内存：{} MB（上限 {} MB）\n\
              存储配额：{} MB\n\
              网卡：{}\n\
+             本机 IP：{}\n\
              Relink：{}\n\
              标语：天空属于哈夫克，新世界就在你耳边",
             self.config.core.version,
@@ -138,6 +139,7 @@ impl MandelCore {
             self.config.hardware.memory_limit_mb,
             self.config.hardware.storage_quota_mb,
             h.network,
+            h.local_ip,
             if self.relink.enabled { format!("同频在线:{}", self.relink.discovery_port) } else { "未启用".into() },
         )
     }

@@ -1,42 +1,113 @@
-[2026-09-18 23:35:43.319][INFO] ==================================================
-[2026-09-18 23:35:43.321][INFO]  HAAVK OS · Mandel Core v0.1.0-mvp 启动
-[2026-09-18 23:35:43.321][INFO]  标语：天空属于哈夫克，新世界就在你耳边
-[2026-09-18 23:35:43.321][INFO] ==================================================
-[2026-09-18 23:35:43.321][INFO] 节点 ID：HAAVK-NODE-00001
-[2026-09-18 23:35:43.321][INFO] 读取 Linux 宿主 DMI/SMBIOS 成功
-[2026-09-18 23:35:43.321][INFO] 硬件：HAAVK全域算力终端 / CPU Intel(R) Xeon(R) Platinum 8457C / RAM 4033 MB
-[2026-09-18 23:35:43.321][INFO] Relink 同频总线已绑定 0.0.0.0:42069（节点发现=true）
-[2026-09-18 23:35:43.322][INFO] Relink 同频总线就绪：节点发现=true 端口=42069 最大连接=32
-[2026-09-18 23:35:43.323][INFO] VFS 自动挂载完成（3 个挂载点）
-[2026-09-18 23:35:43.323][INFO] VFS 挂载点：haavk://system → /home/user/.haavk | haavk://home → /home/user | haavk://downloads → /home/user/Downloads
-[2026-09-18 23:35:43.325][INFO] 应用仓库扫描完成：0 个 .hvk 应用
-[2026-09-18 23:35:43.325][INFO] .hvk 应用仓库就绪：4 个应用
-[2026-09-18 23:35:43.325][INFO] 曼德尔镜像已加载: ./haavk_storage.mandel（100 MB / 已用 0 MB）
-[2026-09-18 23:35:43.326][INFO] .mandel 虚拟磁盘挂载：100 MB（已用 0 MB）
-[2026-09-18 23:35:43.326][INFO] 曼德尔核心就绪：daemon=true app_limit=64
-[2026-09-18 23:35:43.328][INFO] Mandel Core 就绪，进入 HAAVK 桌面……
-[2026-09-18 23:35:43.409][INFO] Guessed window scale factor: 1
-[2026-09-18 23:35:43.482][WARN] Unable to find extension: VK_KHR_surface
-[2026-09-18 23:35:43.482][WARN] Unable to find extension: VK_KHR_xlib_surface
-[2026-09-18 23:35:43.482][WARN] Unable to find extension: VK_KHR_xcb_surface
-[2026-09-18 23:35:43.482][WARN] Unable to find extension: VK_KHR_wayland_surface
-[2026-09-18 23:35:43.482][WARN] Unable to find extension: VK_EXT_swapchain_colorspace
-[2026-09-18 23:35:43.482][WARN] Unable to find extension: VK_KHR_get_physical_device_properties2
-[2026-09-18 23:35:43.485][WARN] InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-09-19 00:00:53.216][INFO] ==================================================
+[2026-09-19 00:00:53.218][INFO]  HAAVK OS · Mandel Core v0.1.0-mvp 启动
+[2026-09-19 00:00:53.218][INFO]  标语：天空属于哈夫克，新世界就在你耳边
+[2026-09-19 00:00:53.218][INFO] ==================================================
+[2026-09-19 00:00:53.218][INFO] 节点 ID：HAAVK-NODE-00001
+[2026-09-19 00:00:53.218][INFO] 读取 Linux 宿主 DMI/SMBIOS 成功
+[2026-09-19 00:00:53.218][INFO] 硬件：HAAVK全域算力终端 / CPU AMD EPYC 9Y24 96-Core Processor / RAM 4033 MB / IP 169.254.112.153
+[2026-09-19 00:00:53.218][INFO] Relink 同频总线已绑定 0.0.0.0:42069（节点发现=true）
+[2026-09-19 00:00:53.218][INFO] Relink 同频总线就绪：节点发现=true 端口=42069 最大连接=32
+[2026-09-19 00:00:53.219][INFO] VFS 自动挂载完成（3 个挂载点）
+[2026-09-19 00:00:53.219][INFO] VFS 挂载点：haavk://system → /home/user/.haavk | haavk://home → /home/user | haavk://downloads → /home/user/Downloads
+[2026-09-19 00:00:53.221][INFO] 应用仓库扫描完成：0 个 .hvk 应用
+[2026-09-19 00:00:53.221][INFO] .hvk 应用仓库就绪：4 个应用
+[2026-09-19 00:00:53.222][INFO] 曼德尔镜像已加载: ./haavk_storage.mandel（100 MB / 已用 0 MB）
+[2026-09-19 00:00:53.222][INFO] .mandel 虚拟磁盘挂载：100 MB（已用 0 MB）
+[2026-09-19 00:00:53.222][INFO] 曼德尔核心就绪：daemon=true app_limit=64
+[2026-09-19 00:00:53.225][INFO] Mandel Core 就绪，进入 HAAVK 桌面……
+[2026-09-19 00:00:53.283][WARN] error setting XSETTINGS; Xft options won't reload automatically
+[2026-09-19 00:00:53.307][WARN] XRandR reported that the display's 0mm in size, which is certifiably insane
+[2026-09-19 00:00:53.307][INFO] Guessed window scale factor: 1
+[2026-09-19 00:00:53.384][WARN] Unable to find extension: VK_KHR_surface
+[2026-09-19 00:00:53.384][WARN] Unable to find extension: VK_KHR_xlib_surface
+[2026-09-19 00:00:53.384][WARN] Unable to find extension: VK_KHR_xcb_surface
+[2026-09-19 00:00:53.384][WARN] Unable to find extension: VK_KHR_wayland_surface
+[2026-09-19 00:00:53.384][WARN] Unable to find extension: VK_EXT_swapchain_colorspace
+[2026-09-19 00:00:53.384][WARN] Unable to find extension: VK_KHR_get_physical_device_properties2
+[2026-09-19 00:00:53.387][WARN] InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-09-19 00:00:53.387][INFO] GENERAL [Loader Message (0x0)]
+	Searching for layer manifest files
+[2026-09-19 00:00:53.393][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
+	   In following folders:
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
 	      /home/user/.config/vulkan/implicit_layer.d
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
 	      /etc/xdg/vulkan/implicit_layer.d
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
 	      /etc/vulkan/implicit_layer.d
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
 	      /runtime/aio/app-data/aio/.local/share/vulkan/implicit_layer.d
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
 	      /usr/local/share/vulkan/implicit_layer.d
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.396][INFO] GENERAL [Loader Message (0x0)]
 	      /usr/share/vulkan/implicit_layer.d
+[2026-09-19 00:00:53.396][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	   Found no files
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	Searching for layer manifest files
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	   In following folders:
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
 	      /home/user/.config/vulkan/explicit_layer.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
 	      /etc/xdg/vulkan/explicit_layer.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
 	      /etc/vulkan/explicit_layer.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
 	      /runtime/aio/app-data/aio/.local/share/vulkan/explicit_layer.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
 	      /usr/local/share/vulkan/explicit_layer.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
 	      /usr/share/vulkan/explicit_layer.d
-[2026-09-18 23:35:43.500][INFO] Using X11 platform
-[2026-09-18 23:35:43.607][WARN] Detected a linear (sRGBA aware) framebuffer Rgba8UnormSrgb. egui prefers Rgba8Unorm or Bgra8Unorm
-[2026-09-18 23:35:43.609][INFO] HAAVK 桌面渲染器已初始化
-[2026-09-18 23:35:43.629][INFO] 加载中文字体: assets/fonts/NotoSansCJK-Regular.ttc
-[2026-09-18 23:35:43.629][INFO] HAAVK 桌面窗口已创建（1280x800）
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	   Found no files
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	Searching for driver manifest files
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	   In following folders:
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	      /home/user/.config/vulkan/icd.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	      /etc/xdg/vulkan/icd.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	      /etc/vulkan/icd.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	      /runtime/aio/app-data/aio/.local/share/vulkan/icd.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	      /usr/local/share/vulkan/icd.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.397][INFO] GENERAL [Loader Message (0x0)]
+	      /usr/share/vulkan/icd.d
+[2026-09-19 00:00:53.397][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.398][INFO] GENERAL [Loader Message (0x0)]
+	   Found no files
+[2026-09-19 00:00:53.398][INFO] 	objects: (type: INSTANCE, hndl: 0x55f3e497d240, name: ?)
+[2026-09-19 00:00:53.404][INFO] Using X11 platform
+[2026-09-19 00:00:53.498][WARN] Detected a linear (sRGBA aware) framebuffer Rgba8UnormSrgb. egui prefers Rgba8Unorm or Bgra8Unorm
+[2026-09-19 00:00:53.503][INFO] HAAVK 桌面渲染器已初始化
+[2026-09-19 00:00:53.602][INFO] 加载中文字体: assets/fonts/NotoSansCJK-Regular.ttc
+[2026-09-19 00:00:53.603][INFO] HAAVK 桌面窗口已创建（1280x800）
