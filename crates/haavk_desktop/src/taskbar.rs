@@ -77,12 +77,62 @@ pub fn show(ctx: &egui::Context, ui_state: &mut UiState) -> Action {
                     });
                     ui.separator();
 
+                    // 通知中心铃铛
+                    let bell = egui::Button::new(
+                        RichText::new("🔔").size(14.0).color(if ui_state.notifications_open { theme::ACCENT_LIGHT } else { theme::TEXT_MAIN }),
+                    )
+                    .min_size(egui::vec2(32.0, 32.0))
+                    .fill(if ui_state.notifications_open { theme::PRIMARY_DARK } else { theme::BG_TASKBAR });
+                    if ui.add(bell).clicked() {
+                        ui_state.notifications_open = !ui_state.notifications_open;
+                    }
+                    ui.add_space(6.0);
+
                     // 算力状态（Relink）
                     ui.label(RichText::new("▲ 算力在线").size(12.0).color(theme::PRIMARY));
                     ui.add_space(6.0);
                 });
             });
         });
+
+    // 通知中心弹出面板
+    if ui_state.notifications_open {
+        let screen = ctx.screen_rect();
+        let pos = egui::pos2(screen.right() - 320.0, screen.bottom() - 40.0 - 360.0);
+        egui::Area::new(egui::Id::new("notif_center"))
+            .fixed_pos(pos)
+            .order(egui::Order::Foreground)
+            .show(ctx, |ui| {
+                egui::Frame::new()
+                    .fill(theme::BG_PANEL)
+                    .stroke(egui::Stroke::new(1.0_f32, theme::PRIMARY_DARK))
+                    .corner_radius(egui::CornerRadius::same(8))
+                    .inner_margin(egui::Margin::same(12))
+                    .show(ui, |ui| {
+                        ui.set_width(300.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("🔔 通知中心").strong().size(15.0).color(theme::ACCENT_LIGHT));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.small_button("清空").clicked() {
+                                    ui_state.notifications.clear();
+                                }
+                            });
+                        });
+                        ui.separator();
+                        if ui_state.notifications.is_empty() {
+                            ui.label(RichText::new("暂无通知").color(theme::TEXT_DIM));
+                        } else {
+                            for n in &ui_state.notifications {
+                                ui.horizontal(|ui| {
+                                    ui.label(RichText::new("●").color(theme::PRIMARY));
+                                    ui.label(RichText::new(n).size(12.0).color(theme::TEXT_MAIN));
+                                });
+                                ui.separator();
+                            }
+                        }
+                    });
+            });
+    }
 
     action
 }

@@ -73,6 +73,10 @@ pub struct UiState {
     pub active: Option<u64>,
     pub accent: egui::Color32,
     pub alt_tab_hint: Option<(u64, Instant)>,
+    pub splash_start: Instant,
+    pub notifications_open: bool,
+    pub notifications: Vec<String>,
+    pub wallpaper_idx: usize,
 }
 
 impl UiState {
@@ -88,6 +92,14 @@ impl UiState {
             active: None,
             accent: theme::PRIMARY,
             alt_tab_hint: None,
+            splash_start: Instant::now(),
+            notifications_open: false,
+            notifications: vec![
+                "Relink 同频总线已上线 (UDP 42069)".into(),
+                ".mandel 虚拟磁盘已挂载 100 GB".into(),
+                "HAAVK 全域算力终端就绪".into(),
+            ],
+            wallpaper_idx: 0,
         }
     }
 
@@ -273,6 +285,58 @@ impl App {
         // 4. 开始菜单
         let s_action = start_menu::show(ctx, &mut self.ui, &self.core);
         self.apply(s_action);
+
+        // 5. 开机动画（启动 2.2 秒内覆盖全屏）
+        if self.ui.splash_start.elapsed().as_secs_f32() < 2.2 {
+            self.show_splash(ctx);
+        }
+    }
+
+    /// HAAVK 开机动画：深色全屏 + 几何 logo + 加载文字
+    fn show_splash(&self, ctx: &egui::Context) {
+        let screen = ctx.screen_rect();
+        egui::Area::new(egui::Id::new("haavk_splash"))
+            .fixed_pos(screen.min)
+            .order(egui::Order::Foreground)
+            .show(ctx, |ui| {
+                ui.painter().rect_filled(screen, 0.0, theme::BG_DARK);
+                // 居中大 logo
+                let c = screen.center();
+                theme::spire_icon(ui.painter(), c, 120.0, theme::PRIMARY);
+                // 标题
+                ui.painter().text(
+                    egui::pos2(c.x, c.y + 90.0),
+                    egui::Align2::CENTER_CENTER,
+                    "HAAVK OS",
+                    egui::FontId::proportional(36.0),
+                    theme::ACCENT_LIGHT,
+                );
+                ui.painter().text(
+                    egui::pos2(c.x, c.y + 120.0),
+                    egui::Align2::CENTER_CENTER,
+                    "天空属于哈夫克，新世界就在你耳边",
+                    egui::FontId::proportional(14.0),
+                    theme::TEXT_DIM,
+                );
+                // 加载条（动画）
+                let t = self.ui.splash_start.elapsed().as_secs_f32();
+                let bw = 240.0;
+                let bx = c.x - bw / 2.0;
+                let by = c.y + 160.0;
+                ui.painter().rect_stroke(
+                    egui::Rect::from_min_max(egui::pos2(bx, by), egui::pos2(bx + bw, by + 3.0)),
+                    1.5,
+                    egui::Stroke::new(1.0, theme::BORDER),
+                    egui::StrokeKind::Inside,
+                );
+                ui.painter().rect_filled(
+                    egui::Rect::from_min_max(egui::pos2(bx, by), egui::pos2(bx + bw * t.min(1.0), by + 3.0)),
+                    1.5,
+                    theme::PRIMARY,
+                );
+            });
+        // 持续重绘直到动画结束
+        ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 
     /// 应用窗口层

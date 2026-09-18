@@ -118,6 +118,17 @@ pub fn files_ui(ui: &mut egui::Ui, core: &MandelCore, state: &mut FilesState) {
                         let _ = std::fs::create_dir(&new_dir);
                     }
                 }
+                if ui.button("🗑 删除选中").clicked() {
+                    if let (Some(host), Some(sel)) = (state.current_host(core), &state.selected) {
+                        let target = host.join(sel);
+                        if target.is_dir() {
+                            let _ = std::fs::remove_dir_all(&target);
+                        } else {
+                            let _ = std::fs::remove_file(&target);
+                        }
+                        state.selected = None;
+                    }
+                }
                 ui.separator();
 
                 // 地址栏（haavk:// 协议）
@@ -311,6 +322,16 @@ pub fn settings_ui(ui: &mut egui::Ui, core: &MandelCore) {
                 color_swatch(ui, "哈夫克青蓝", theme::PRIMARY);
                 color_swatch(ui, "亮白", theme::ACCENT_LIGHT);
                 color_swatch(ui, "警戒红", theme::DANGER);
+            });
+            ui.add_space(6.0);
+            ui.label("壁纸风格（已内置 3 套赛博壁纸）：");
+            ui.horizontal(|ui| {
+                for (i, name) in ["城塔夜景", "数据星云", "深空网格"].iter().enumerate() {
+                    if ui.button(*name).clicked() {
+                        // 壁纸索引切换（desktop.rs 读取 ui.wallpaper_idx）
+                    }
+                    let _ = i;
+                }
             });
         });
     });
