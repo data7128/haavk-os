@@ -40,6 +40,15 @@ pub struct PeerNode {
     pub last_seen: Instant,
 }
 
+/// 消息日志条目
+#[derive(Debug, Clone)]
+pub struct LogEntry {
+    pub time: String,
+    pub direction: String, // "IN" / "OUT"
+    pub kind: String,
+    pub detail: String,
+}
+
 /// 广播消息（UDP 数据报载荷）
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum RelinkMessage {
@@ -65,6 +74,7 @@ pub struct RelinkBus {
     pub max_connections: u32,
     running: bool,
     peers: Arc<Mutex<HashMap<String, PeerNode>>>,
+    message_log: Arc<Mutex<Vec<LogEntry>>>,
     stop_flag: Arc<AtomicBool>,
     socket: Option<UdpSocket>,
 }
@@ -77,10 +87,31 @@ impl RelinkBus {
             discovery_port: config.relink_bus.discovery_port,
             max_connections: config.relink_bus.max_connections,
             peers: Arc::new(Mutex::new(HashMap::new())),
+            message_log: Arc::new(Mutex::new(Vec::new())),
             stop_flag: Arc::new(AtomicBool::new(false)),
             socket: None,
             running: false,
         }
+    }
+
+    /// 追加一条消息日志（最多保留 100 条）
+    pub fn log(&self, direction: &str, kind: &str, detail: &str) {
+        let time = chrono::Local::now().format("%H:%M:%S").to_string();
+        let mut log = self.message_log.lock().unwrap();
+        log.push(LogEntry {
+            time,
+            direction: direction.into(),
+            kind: kind.into(),
+            detail: detail.into(),
+        });
+        if log.len() > 100 {
+            log.remove(0);
+        }
+    }
+
+    /// 获取消息日志快照
+    pub fn log_entries(&self) -> Vec<LogEntry> {
+        self.message_log.lock().unwrap().clone()
     }
 
     /// 启动总线：绑定 UDP socket，启动广播线程 + 监听线程
@@ -142,6 +173,7 @@ impl RelinkBus {
         let rcv = self.socket.as_ref().unwrap().try_clone().unwrap();
         let peers = self.peers.clone();
         let stop = self.stop_flag.clone();
+        let log_clone = self.message_log.clone();
         std::thread::spawn(move || {
             let mut buf = [0u8; 2048];
             loop {
@@ -154,6 +186,12 @@ impl RelinkBus {
                         if let Ok(msg) = serde_json::from_slice::<RelinkMessage>(data) {
                             match msg {
                                 RelinkMessage::Hello { node_id, product, version } => {
+                                    log_clone.lock().unwrap().push(LogEntry {
+                                        time: chrono::Local::now().format("%H:%M:%S").to_string(),
+                                        direction: "IN".into(),
+                                        kind: "Hello".into(),
+                                        detail: format!("{node_id} @ {addr}"),
+                                    });
                                     let mut map = peers.lock().unwrap();
                                     map.insert(
                                         node_id.clone(),
@@ -166,8 +204,14 @@ impl RelinkBus {
                                         },
                                     );
                                 }
-                                RelinkMessage::AppMessage { from, kind, .. } => {
-                                    info!("Relink 应用消息：{} → {}", from, kind);
+                                RelinkMessage::AppMessage { from, to, kind, .. } => {
+                                    let time = chrono::Local::now().format("%H:%M:%S").to_string();
+                                    log_clone.lock().unwrap().push(LogEntry {
+                                        time,
+                                        direction: "IN".into(),
+                                        kind: kind,
+                                        detail: format!("{from} → {to}"),
+                                    });
                                 }
                             }
                         }

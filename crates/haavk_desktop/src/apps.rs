@@ -702,6 +702,30 @@ pub fn nodes_ui(ui: &mut egui::Ui, core: &MandelCore) {
         ui.label(RichText::new(format!("本机: {} · Relink 端口 {}", core.node.node_id, core.relink.discovery_port))
             .monospace().size(11.0).color(theme::TEXT_DIM));
     });
+
+    // ── 消息日志面板 ──
+    ui.separator();
+    ui.horizontal(|ui| {
+        ui.label(RichText::new("Relink 消息日志").strong().size(14.0).color(theme::ACCENT_LIGHT));
+    });
+    let entries = core.relink.log_entries();
+    if entries.is_empty() {
+        ui.label(RichText::new("暂无消息 · 等待节点接入或网络活动").size(11.5).color(theme::TEXT_DIM));
+    } else {
+        egui::ScrollArea::vertical()
+            .max_height(180.0)
+            .show(ui, |ui| {
+                for e in entries.iter().rev() {
+                    let dir_color = if e.direction == "IN" { theme::PRIMARY } else { theme::TEXT_DIM };
+                    ui.horizontal(|ui| {
+                        ui.label(RichText::new(&e.time).monospace().size(11.0).color(theme::TEXT_DIM));
+                        ui.colored_label(dir_color, &e.direction);
+                        ui.label(RichText::new(&e.kind).monospace().size(11.5).color(theme::ACCENT_LIGHT));
+                        ui.label(RichText::new(&e.detail).size(11.5).color(theme::TEXT_MAIN));
+                    });
+                }
+            });
+    }
 }
 
 // ============================================================
