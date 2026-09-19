@@ -476,9 +476,17 @@ fn run_shell_cmd(core: &MandelCore, state: &mut TerminalState, cmd: &str) {
             out("  disk          显示 .mandel 虚拟磁盘用量");
             out("  ping <主机>   测试网络连通性");
             out("  curl <URL>    获取网页内容（前 500 字节）");
+            out("  echo <文本>   输出文本");
+            out("  whoami        显示当前用户");
+            out("  uname         显示系统名");
+            out("  date          显示当前时间");
             out("  clear         清空终端");
         }
         "pwd" => out(&state.cwd),
+        "echo" => out(&parts.collect::<Vec<_>>().join(" ")),
+        "whoami" => out("haavk"),
+        "uname" => out("HAAVK-Mandel-Core 0.9 (userland microkernel)"),
+        "date" => out(&chrono::Local::now().format("%Y-%m-%d %H:%M:%S %Z").to_string()),
         "ls" => {
             let path = parts.next().unwrap_or(&state.cwd);
             match core.vfs.resolve(path) {
