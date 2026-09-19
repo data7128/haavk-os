@@ -9,6 +9,7 @@
 //! 广播/组播的具体实现委托宿主内核网络栈。
 
 use std::collections::HashMap;
+use std::io::{Read, Write};
 use std::net::{Ipv4Addr, SocketAddr, UdpSocket};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
@@ -203,12 +204,12 @@ impl RelinkBus {
     }
 }
 
-/// 公网中继客户端（Stage 4 骨架）：跨网段节点通过中继服务器互联
+/// 公网中继客户端：跨网段节点通过中继服务器互联
 ///
-/// 协议：TCP 长连接到中继服务器（默认 haavk://relay ）
-/// - 连接后发送 `Hello{node_id}` 注册
+/// 协议：TCP 长连接到中继服务器
+/// - 连接后发送 `Hello{node_id, product, version}` 注册
 /// - 中继服务器转发其他节点的 AppMessage
-/// - 网络断开自动重连（指数退避）
+/// - 网络断开自动重连（指数退避 1s→30s）
 pub struct RelayClient {
     pub server_addr: String,
     pub enabled: bool,
@@ -220,23 +221,47 @@ impl RelayClient {
         Self { server_addr: server_addr.into(), enabled, connected: false }
     }
 
-    /// 尝试连接中继服务器（骨架：仅建立 TCP 连接，不做完整握手）
-    pub fn connect(&mut self) -> Result<(), String> {
+    /// 启动中继客户端后台线程（自动重连）
+    pub fn start(&mut self, node_id: &str, product: &str, version: &str) {
         if !self.enabled {
-            return Ok(());
+            info!("公网中继未启用，使用局域网广播模式");
+            return;
         }
-        match std::net::TcpStream::connect(&self.server_addr) {
-            Ok(_stream) => {
-                self.connected = true;
-                info!("公网中继已连接：{}", self.server_addr);
-                Ok(())
+        let addr = self.server_addr.clone();
+        let nid = node_id.to_string();
+        let prod = product.to_string();
+        let ver = version.to_string();
+        std::thread::spawn(move || {
+            let mut backoff = 1u64;
+            loop {
+                match std::net::TcpStream::connect(&addr) {
+                    Ok(mut stream) => {
+                        info!("公网中继已连接：{addr}");
+                        let msg = RelinkMessage::Hello { node_id: nid.clone(), product: prod.clone(), version: ver.clone() };
+                        if let Ok(bytes) = serde_json::to_vec(&msg) {
+                            let _ = stream.write_all(&bytes);
+                        }
+                        // 保持连接直到断开
+                        let mut buf = [0u8; 2048];
+                        loop {
+                            match stream.read(&mut buf) {
+                                Ok(0) => break,
+                                Ok(_n) => { /* 收到中继转发消息，骨架：记录 */ }
+                                Err(_) => break,
+                            }
+                        }
+                        warn!("公网中继连接断开，{backoff}s 后重连...");
+                        std::thread::sleep(std::time::Duration::from_secs(backoff));
+                        backoff = (backoff * 2).min(30);
+                    }
+                    Err(e) => {
+                        warn!("公网中继连接失败（{e}），{backoff}s 后重试");
+                        std::thread::sleep(std::time::Duration::from_secs(backoff));
+                        backoff = (backoff * 2).min(30);
+                    }
+                }
             }
-            Err(e) => {
-                self.connected = false;
-                warn!("公网中继连接失败（{}），将使用局域网广播模式", e);
-                Err(format!("中继连接失败: {e}"))
-            }
-        }
+        });
     }
 
     pub fn is_connected(&self) -> bool {

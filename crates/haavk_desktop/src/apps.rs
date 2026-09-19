@@ -708,53 +708,81 @@ pub fn nodes_ui(ui: &mut egui::Ui, core: &MandelCore) {
 // HAAVK 全域浏览器（极简网页查看器）
 // ============================================================
 
-pub struct BrowserState {
+pub struct BrowserTab {
     pub url: String,
-    pub page_title: String,
-    pub page_text: String,
-    pub loading: bool,
+    pub title: String,
+    pub text: String,
+}
+
+pub struct BrowserState {
+    pub tabs: Vec<BrowserTab>,
+    pub active: usize,
+    pub url_input: String,
 }
 
 impl Default for BrowserState {
     fn default() -> Self {
         Self {
-            url: "https://www.example.com".into(),
-            page_title: String::new(),
-            page_text: "在地址栏输入 URL，按回车访问 HAAVK 全域网络".into(),
-            loading: false,
+            tabs: vec![BrowserTab {
+                url: "https://www.example.com".into(),
+                title: "新标签页".into(),
+                text: "在地址栏输入 URL，按回车访问 HAAVK 全域网络".into(),
+            }],
+            active: 0,
+            url_input: "https://www.example.com".into(),
         }
     }
 }
 
 pub fn browser_ui(ui: &mut egui::Ui, state: &mut BrowserState) {
-    // 地址栏
-    egui::TopBottomPanel::top("browser_toolbar")
-        .frame(egui::Frame::new().inner_margin(egui::Margin::same(6)))
+    // 标签栏
+    egui::TopBottomPanel::top("browser_top")
+        .frame(egui::Frame::new().inner_margin(egui::Margin::symmetric(4, 2)))
         .show_inside(ui, |ui| {
+            // 标签行
+            ui.horizontal(|ui| {
+                for i in 0..state.tabs.len() {
+                    let tab_title = if state.tabs[i].title.is_empty() { "新标签" } else { &state.tabs[i].title };
+                    let short: String = tab_title.chars().take(14).collect();
+                    let btn = egui::Button::new(RichText::new(format!("{short} ✕")).size(12.0))
+                        .fill(if state.active == i { theme::PRIMARY_DARK } else { theme::BG_PANEL });
+                    if ui.add(btn).clicked() {
+                        state.active = i;
+                    }
+                }
+                if ui.button("＋").clicked() {
+                    state.tabs.push(BrowserTab {
+                        url: String::new(),
+                        title: "新标签页".into(),
+                        text: "新标签页".into(),
+                    });
+                    state.active = state.tabs.len() - 1;
+                }
+            });
+            // 地址栏
             ui.horizontal(|ui| {
                 ui.label(RichText::new("🔗").size(14.0));
+                state.url_input = state.tabs[state.active].url.clone();
                 let resp = ui.add(
-                    egui::TextEdit::singleline(&mut state.url)
+                    egui::TextEdit::singleline(&mut state.url_input)
                         .desired_width(ui.available_width() - 90.0)
                         .font(egui::TextStyle::Monospace),
                 );
                 if (resp.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)))
                     || ui.button("前往 →").clicked()
                 {
-                    state.loading = true;
-                    let url = state.url.clone();
-                    // 同步抓取（简单实现）
+                    let url = state.url_input.clone();
                     match fetch_page(&url) {
                         Ok((title, text)) => {
-                            state.page_title = title;
-                            state.page_text = text;
+                            state.tabs[state.active].url = url;
+                            state.tabs[state.active].title = title;
+                            state.tabs[state.active].text = text;
                         }
                         Err(e) => {
-                            state.page_title = "加载失败".into();
-                            state.page_text = format!("无法访问 {url}: {e}");
+                            state.tabs[state.active].title = "加载失败".into();
+                            state.tabs[state.active].text = format!("无法访问 {url}: {e}");
                         }
                     }
-                    state.loading = false;
                 }
             });
         });
@@ -763,15 +791,13 @@ pub fn browser_ui(ui: &mut egui::Ui, state: &mut BrowserState) {
     egui::CentralPanel::default()
         .frame(egui::Frame::new().inner_margin(egui::Margin::same(10)))
         .show_inside(ui, |ui| {
-            if state.loading {
-                ui.label("加载中……");
-            }
+            let tab = &state.tabs[state.active];
             ui.horizontal(|ui| {
-                ui.label(RichText::new(&state.page_title).strong().size(16.0).color(theme::ACCENT_LIGHT));
+                ui.label(RichText::new(&tab.title).strong().size(16.0).color(theme::ACCENT_LIGHT));
             });
             ui.separator();
             egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.label(RichText::new(&state.page_text).size(13.0).color(theme::TEXT_MAIN));
+                ui.label(RichText::new(&tab.text).size(13.0).color(theme::TEXT_MAIN));
             });
         });
 }

@@ -75,6 +75,22 @@ pub fn show(ctx: &egui::Context, ui_state: &mut UiState) -> Action {
                     action = Action::Open(AppKind::Files);
                     close = true;
                 }
+                if ui.button("全域浏览器").clicked() {
+                    action = Action::Open(AppKind::Browser);
+                    close = true;
+                }
+                if ui.button("应用中心").clicked() {
+                    action = Action::Open(AppKind::AppCenter);
+                    close = true;
+                }
+                if ui.button("同频节点").clicked() {
+                    action = Action::Open(AppKind::Nodes);
+                    close = true;
+                }
+                if ui.button("终端").clicked() {
+                    action = Action::Open(AppKind::Terminal);
+                    close = true;
+                }
                 if ui.button("系统设置").clicked() {
                     action = Action::Open(AppKind::Settings);
                     close = true;
