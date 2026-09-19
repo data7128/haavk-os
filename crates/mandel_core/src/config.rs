@@ -186,6 +186,11 @@ pub fn default_config_path() -> PathBuf {
 }
 
 /// 加载配置：显式路径 > 默认路径；文件不存在时回退内置默认配置并提示。
+/// 从 node_id（如 HAAVK-NODE-00001）提取数字编号
+fn parse_node_num(node_id: &str) -> Option<u32> {
+    node_id.rsplit('-').next()?.parse().ok()
+}
+
 pub fn load_config(explicit: Option<&Path>) -> Result<MandelConfig, String> {
     let path = match explicit {
         Some(p) => p.to_path_buf(),
@@ -197,6 +202,12 @@ pub fn load_config(explicit: Option<&Path>) -> Result<MandelConfig, String> {
         let cfg: MandelConfig = toml::from_str(&raw).map_err(|e| format!("解析 {} 失败: {e}", path.display()))?;
         if cfg.core.node_id.is_empty() {
             return Err("配置中 node_id 为空，请检查 mandel_core.toml".into());
+        }
+        // DMI 节点编号上限 9999
+        if let Some(num) = parse_node_num(&cfg.core.node_id) {
+            if num > 9999 {
+                return Err(format!("DMI 节点编号 {num} 超出上限 9999"));
+            }
         }
         return Ok(cfg);
     }

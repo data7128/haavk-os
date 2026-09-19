@@ -1,0 +1,13 @@
+[package]
+name = "haavk_kernel"
+version = "0.9.0"
+edition = "2021"
+description = "HAAVK Mandel Bare Metal Kernel 曼德尔裸机内核（no_std x86_64）"
+
+[[bin]]
+name = "haavk_kernel"
+path = "src/main.rs"
+
+[dependencies]
+# 裸机内核不依赖 std，仅用核心库
+# VGA text mode 直接写入 0xB8000 显存
