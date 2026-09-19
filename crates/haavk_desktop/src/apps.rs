@@ -718,6 +718,9 @@ pub struct BrowserState {
     pub tabs: Vec<BrowserTab>,
     pub active: usize,
     pub url_input: String,
+    pub bookmarks: Vec<String>,
+    pub history: Vec<String>,
+    pub show_bookmarks: bool,
 }
 
 impl Default for BrowserState {
@@ -730,6 +733,9 @@ impl Default for BrowserState {
             }],
             active: 0,
             url_input: "https://www.example.com".into(),
+            bookmarks: vec!["https://www.example.com".into(), "https://github.com".into()],
+            history: vec![],
+            show_bookmarks: false,
         }
     }
 }
@@ -774,9 +780,13 @@ pub fn browser_ui(ui: &mut egui::Ui, state: &mut BrowserState) {
                     let url = state.url_input.clone();
                     match fetch_page(&url) {
                         Ok((title, text)) => {
-                            state.tabs[state.active].url = url;
+                            state.tabs[state.active].url = url.clone();
                             state.tabs[state.active].title = title;
                             state.tabs[state.active].text = text;
+                            state.history.push(url.clone());
+                            if state.history.len() > 50 {
+                                state.history.remove(0);
+                            }
                         }
                         Err(e) => {
                             state.tabs[state.active].title = "加载失败".into();
@@ -784,7 +794,41 @@ pub fn browser_ui(ui: &mut egui::Ui, state: &mut BrowserState) {
                         }
                     }
                 }
+                // 书签：收藏当前页
+                if ui.button("☆").clicked() {
+                    let url = state.tabs[state.active].url.clone();
+                    if !state.bookmarks.contains(&url) && !url.is_empty() {
+                        state.bookmarks.push(url);
+                    }
+                }
+                // 显示书签栏
+                if ui.button("📑").clicked() {
+                    state.show_bookmarks = !state.show_bookmarks;
+                }
             });
+
+            // 书签栏（可折叠）
+            if state.show_bookmarks {
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new("书签:").size(11.0).color(theme::TEXT_DIM));
+                    for bm in &state.bookmarks {
+                        if ui.small_button(RichText::new(bm.chars().take(24).collect::<String>()).size(11.0)).clicked() {
+                            let url = bm.clone();
+                            match fetch_page(&url) {
+                                Ok((title, text)) => {
+                                    state.tabs[state.active].url = url.clone();
+                                    state.tabs[state.active].title = title;
+                                    state.tabs[state.active].text = text;
+                                    state.history.push(url);
+                                }
+                                Err(e) => {
+                                    state.tabs[state.active].text = format!("加载失败: {e}");
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         });
 
     // 页面内容
