@@ -703,3 +703,120 @@ pub fn nodes_ui(ui: &mut egui::Ui, core: &MandelCore) {
             .monospace().size(11.0).color(theme::TEXT_DIM));
     });
 }
+
+// ============================================================
+// HAAVK 全域浏览器（极简网页查看器）
+// ============================================================
+
+pub struct BrowserState {
+    pub url: String,
+    pub page_title: String,
+    pub page_text: String,
+    pub loading: bool,
+}
+
+impl Default for BrowserState {
+    fn default() -> Self {
+        Self {
+            url: "https://www.example.com".into(),
+            page_title: String::new(),
+            page_text: "在地址栏输入 URL，按回车访问 HAAVK 全域网络".into(),
+            loading: false,
+        }
+    }
+}
+
+pub fn browser_ui(ui: &mut egui::Ui, state: &mut BrowserState) {
+    // 地址栏
+    egui::TopBottomPanel::top("browser_toolbar")
+        .frame(egui::Frame::new().inner_margin(egui::Margin::same(6)))
+        .show_inside(ui, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(RichText::new("🔗").size(14.0));
+                let resp = ui.add(
+                    egui::TextEdit::singleline(&mut state.url)
+                        .desired_width(ui.available_width() - 90.0)
+                        .font(egui::TextStyle::Monospace),
+                );
+                if (resp.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)))
+                    || ui.button("前往 →").clicked()
+                {
+                    state.loading = true;
+                    let url = state.url.clone();
+                    // 同步抓取（简单实现）
+                    match fetch_page(&url) {
+                        Ok((title, text)) => {
+                            state.page_title = title;
+                            state.page_text = text;
+                        }
+                        Err(e) => {
+                            state.page_title = "加载失败".into();
+                            state.page_text = format!("无法访问 {url}: {e}");
+                        }
+                    }
+                    state.loading = false;
+                }
+            });
+        });
+
+    // 页面内容
+    egui::CentralPanel::default()
+        .frame(egui::Frame::new().inner_margin(egui::Margin::same(10)))
+        .show_inside(ui, |ui| {
+            if state.loading {
+                ui.label("加载中……");
+            }
+            ui.horizontal(|ui| {
+                ui.label(RichText::new(&state.page_title).strong().size(16.0).color(theme::ACCENT_LIGHT));
+            });
+            ui.separator();
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                ui.label(RichText::new(&state.page_text).size(13.0).color(theme::TEXT_MAIN));
+            });
+        });
+}
+
+/// 抓取网页：HTTP GET + 提取 title + 纯文本
+fn fetch_page(url: &str) -> Result<(String, String), String> {
+    let resp = ureq::get(url).timeout(std::time::Duration::from_secs(10)).call().map_err(|e| e.to_string())?;
+    let status = resp.status();
+    let body = resp.into_string().map_err(|e| e.to_string())?;
+
+    // 提取 <title>
+    let title = body
+        .split("<title>")
+        .nth(1)
+        .and_then(|rest| rest.split("</title>").next())
+        .unwrap_or("无标题")
+        .trim()
+        .to_string();
+
+    // 剥离 HTML 标签
+    let text = strip_html(&body);
+    let preview: String = text.chars().take(3000).collect();
+
+    Ok((format!("{title} · HTTP {status}"), preview))
+}
+
+/// 简单 HTML → 纯文本
+fn strip_html(html: &str) -> String {
+    let mut out = String::new();
+    let mut in_tag = false;
+    for ch in html.chars() {
+        match ch {
+            '<' => in_tag = true,
+            '>' => {
+                in_tag = false;
+                out.push('\n');
+            }
+            _ if !in_tag => out.push(ch),
+            _ => {}
+        }
+    }
+    // 压缩空行
+    out.lines()
+        .map(|l| l.trim())
+        .filter(|l| !l.is_empty())
+        .collect::<Vec<_>>()
+        .join("\n")
+}

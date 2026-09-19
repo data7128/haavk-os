@@ -36,6 +36,7 @@ pub enum AppKind {
     Terminal,
     AppCenter,
     Nodes,
+    Browser,
 }
 
 impl AppKind {
@@ -47,6 +48,7 @@ impl AppKind {
             AppKind::Terminal => "HAAVK 终端",
             AppKind::AppCenter => "HAAVK 应用中心",
             AppKind::Nodes => "Relink 同频节点",
+            AppKind::Browser => "HAAVK 全域浏览器",
         }
     }
 }
@@ -59,6 +61,7 @@ pub struct AppWindow {
     pub minimized: bool,
     pub files: Option<apps::FilesState>,
     pub terminal: Option<apps::TerminalState>,
+    pub browser: Option<apps::BrowserState>,
 }
 
 /// 桌面 UI 全局状态
@@ -126,6 +129,7 @@ impl UiState {
             minimized: false,
             files: if kind == AppKind::Files { Some(apps::FilesState::root()) } else { None },
             terminal: if kind == AppKind::Terminal { Some(apps::TerminalState::default()) } else { None },
+            browser: if kind == AppKind::Browser { Some(apps::BrowserState::default()) } else { None },
         });
         self.active = Some(id);
         info!("打开应用窗口：{}", kind.title());
@@ -383,6 +387,10 @@ impl App {
                     }
                     AppKind::AppCenter => apps::app_center_ui(ui, &self.core),
                     AppKind::Nodes => apps::nodes_ui(ui, &self.core),
+                    AppKind::Browser => {
+                        let st = self.ui.windows[i].browser.get_or_insert_with(apps::BrowserState::default);
+                        apps::browser_ui(ui, st);
+                    }
                 });
 
             self.ui.windows[i].open = open;

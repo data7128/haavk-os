@@ -16,6 +16,7 @@ const APPS: &[(&str, AppKind)] = &[
     ("全域节点", AppKind::Files),
     ("应用中心", AppKind::AppCenter),
     ("同频节点", AppKind::Nodes),
+    ("全域浏览器", AppKind::Browser),
     ("系统设置", AppKind::Settings),
     ("关于 HAAVK", AppKind::About),
     ("终端", AppKind::Terminal),

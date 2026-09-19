@@ -22,6 +22,7 @@ egui = "0.31"
 egui-wgpu = "0.31"
 egui-winit = "0.31"
 mandel_core = { path = "../mandel_core" }
+ureq = { version = "2", features = ["json"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
